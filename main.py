@@ -10,7 +10,7 @@ from keras import backend as K
 
 class anime_model:
 	
-	def build(rows, columns, channels, labels, activation, weightsPath=None):
+	def build(rows, columns, channels, labels, activation='relu', weightsPath=None):
 	
 		model = Sequential()
 	
