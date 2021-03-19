@@ -6,6 +6,7 @@ from keras.layers.core import Activation
 from keras.layers.core import Flatten
 from keras.layers.core import Dense
 from keras import backend as K
+from keras.layers.core import Dropout
 
 
 class anime_model:
@@ -23,15 +24,20 @@ class anime_model:
 		model.add(Conv2D(32, 5, padding='same', input_shape=inputShape, 		    
 				activation=activation))
 		model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
+		model.add(Dropout(0.5))
 		
 		#Second Layer
 		model.add(Conv2D(64, 5, padding='same', input_shape=inputShape, 		    
 				activation=activation))
-		model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))		
+		model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
+		model.add(Dropout(0.5))		
 		
 		#Flatten and FC Layer
 		model.add(Flatten())
 		model.add(Dense(1000, activation=activation))
+		
+		#Dropout Layer
+		model.add(Dropout(0.5))
 		
 		#Output Layer
 		model.add(Dense(labels, activation='softmax'))

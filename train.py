@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelBinarizer
 from sklearn.model_selection import train_test_split
 from keras import backend as K
 from keras.optimizers import SGD
+from matplotlib import pyplot
 
 def list_all_files(path):
 	files = []
@@ -23,7 +24,8 @@ os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 ap = argparse.ArgumentParser()
 
 ap.add_argument('-d', '--dataset', required=True, help='path to dataset')
-ap.add_argument('-w', '--weights', required=True, help='path to save weights')
+ap.add_argument('-w', '--weights', default=None, help='path to save weights')
+ap.add_argument('-l', '--load', default=None, help='path to loaded weights')
 
 args = vars(ap.parse_args())
 
@@ -40,14 +42,13 @@ for filePath in filePaths:
 
 	image = cv2.imread(filePath)
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-	image = cv2.resize(image, (100, 100))
-
+	image = cv2.resize(image, (120, 120))
+	
 	
 	data.append(image)
 	labels.append(filePath.split(os.path.sep)[-2])
 	
 	
-
 
 trainX, testX, trainY, testY = train_test_split(data, labels, test_size=0.25, random_state=42)
 
@@ -63,28 +64,38 @@ testY = lb.transform(testY)
 
 if K.image_data_format() == 'channels_first':
 
-	trainX = trainX.reshape((trainX.shape[0], 1, 100, 100))
-	testX = testX.reshape((testX.shape[0], 1, 100, 100))
+	trainX = trainX.reshape((trainX.shape[0], 1, 120, 120))
+	testX = testX.reshape((testX.shape[0], 1, 120, 120))
 else:
-	trainX = trainX.reshape((trainX.shape[0], 100, 100, 1))
-	testX = testX.reshape((testX.shape[0], 100, 100, 1))
+	trainX = trainX.reshape((trainX.shape[0], 120, 120, 1))
+	testX = testX.reshape((testX.shape[0], 120, 120, 1))
 	
 opt = SGD(lr=0.01)
 
-model = nn.build(rows=100, columns=100, channels=1, labels=len(lb.classes_))
+model = nn.build(rows=120, columns=120, channels=1, labels=len(lb.classes_), weightsPath=args['load'])
 model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
+if args['load'] == None:
+	print('[INFO] training..........')
+	result = model.fit(trainX, trainY, batch_size=32, epochs=50, verbose=1)
+	
 
-print('[INFO] training..........')
-model.fit(trainX, trainY, batch_size=32, epochs=20, verbose=1)
+if args['weights'] != None:
+	print('[INFO] dumping weights from model........')
+	model.save_weights(args['weights'], overwrite=True)
+else:
+	print('[INFO] weights will not be saved as path not provided........')
+
 
 print('[INFO] evaluating...........')
 (loss, accuracy) = model.evaluate(testX, testY, batch_size=128, verbose=1)
-print('[INFO] accuracy: {}'.format(accuracy*100))
+print('[INFO] accuracy: {}.........'.format(accuracy*120))
 
-print('[INFO] dumping weights from model')
-model.save_weights(args['weights'], overwrite=True)
-#print(labels)
+#plot results
+pyplot.plot(result.history['accuracy'], label='train')
+pyplot.plot(result.history['accuracy'], label='test')
+pyplot.legend()
+pyplot.show()
 
 
 
