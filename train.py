@@ -6,7 +6,7 @@ import os
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.model_selection import train_test_split
 from keras import backend as K
-from keras.optimizers import SGD
+from keras.optimizers import Adam
 from matplotlib import pyplot as plt
 from keras.preprocessing.image import ImageDataGenerator
 
@@ -19,6 +19,11 @@ def list_all_files(path):
 		for file in f:
 			files.append(os.path.sep.join([r,file]))
 	return files 
+
+def print_summary(data):
+	print(data)
+	f.write(data+"\n")
+	
 
 
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
@@ -84,18 +89,26 @@ aug = ImageDataGenerator(
 	fill_mode='nearest'
 )
 
-INIT_LR = 0.01
-EPOCHS = 70
+INIT_LR = 0.001
+EPOCHS = 25
 	
-opt = SGD(lr=INIT_LR, momentum=0.9, decay=INIT_LR / EPOCHS)
+opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
+#opt = Adam()
+
 
 model = nn.build(rows=120, columns=120, channels=1, labels=len(lb.classes_), weightsPath=args['load'])
 
-model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])q
+#Summary of model
+f = open('params.txt','w+')
+model.summary(print_fn=print_summary)
+f.close()
+
+
+model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
 if args['load'] == None:
 	print('[INFO] training..........')
-	history = model.fit(x=aug.flow(trainX, trainY, batch_size=32), validation_data=(testX, testY), epochs=EPOCHS, verbose=2)
+	history = model.fit(trainX, trainY, batch_size=32, validation_data=(testX, testY), epochs=EPOCHS, verbose=2)
 	
 
 if args['weights'] != None:
