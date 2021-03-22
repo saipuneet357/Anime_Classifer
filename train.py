@@ -6,10 +6,10 @@ import os
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.model_selection import train_test_split
 from keras import backend as K
-from keras.optimizers import Adam
+from keras.optimizers import Adam,SGD
 from matplotlib import pyplot as plt
 from keras.preprocessing.image import ImageDataGenerator
-
+import pickle
 
 def list_all_files(path):
 	files = []
@@ -32,11 +32,12 @@ ap = argparse.ArgumentParser()
 
 ap.add_argument('-d', '--dataset', required=True, help='path to dataset')
 ap.add_argument('-w', '--weights', default=None, help='path to save weights')
-ap.add_argument('-l', '--load', default=None, help='path to loaded weights')
+ap.add_argument('-l', '--load', default=None, help='path to load weights')
+ap.add_argument('-b', '--bin', default=None, help='path to save labels')
 
 args = vars(ap.parse_args())
 
-
+print(args)
 filePaths = list_all_files(args['dataset'])
 
 
@@ -44,10 +45,13 @@ data = []
 labels = []
 
 #convert png to jpg later using imwrite
-
+print('Loading Data......')
 for filePath in filePaths:
 
 	image = cv2.imread(filePath)
+	if image is None:
+		print('{} not found'.format(filePath))
+		continue
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 	image = cv2.resize(image, (120, 120))
 	
@@ -56,7 +60,7 @@ for filePath in filePaths:
 	labels.append(filePath.split(os.path.sep)[-2])
 
 
-
+print('Loading Done.........')
 trainX, testX, trainY, testY = train_test_split(data, labels, test_size=0.25, random_state=42)
 
 trainX = np.array(trainX, dtype='float32')/255.0
@@ -85,14 +89,13 @@ aug = ImageDataGenerator(
 	zoom_range=0.15,
 	width_shift_range=0.2,
 	height_shift_range=0.2,
-	horizontal_flip=True,
 	fill_mode='nearest'
 )
 
 INIT_LR = 0.001
-EPOCHS = 25
+EPOCHS = 60
 	
-opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
+opt = SGD(lr=INIT_LR, momentum=0.9, decay=INIT_LR / EPOCHS)
 #opt = Adam()
 
 
@@ -104,11 +107,11 @@ model.summary(print_fn=print_summary)
 f.close()
 
 
-model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
+model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 
 if args['load'] == None:
 	print('[INFO] training..........')
-	history = model.fit(trainX, trainY, batch_size=32, validation_data=(testX, testY), epochs=EPOCHS, verbose=2)
+	history = model.fit(x=aug.flow(trainX, trainY, batch_size=32), validation_data=(testX, testY), epochs=EPOCHS, verbose=2)
 	
 
 if args['weights'] != None:
@@ -117,6 +120,10 @@ if args['weights'] != None:
 else:
 	print('[INFO] weights will not be saved as path not provided........')
 
+model.save('model.h5')
+f = open(args['bin'], 'wb')
+f.write(pickle.dumps(lb))
+f.close()
 
 print('[INFO] evaluating...........')
 (loss, accuracy) = model.evaluate(testX, testY, batch_size=128, verbose=2)
