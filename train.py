@@ -117,13 +117,14 @@ if args['load'] == None:
 if args['weights'] != None:
 	print('[INFO] dumping weights from model........')
 	model.save_weights(args['weights'], overwrite=True)
+	model.save('model.h5')
+	f = open(args['bin'], 'wb')
+	f.write(pickle.dumps(lb))
+	f.close()
 else:
 	print('[INFO] weights will not be saved as path not provided........')
 
-model.save('model.h5')
-f = open(args['bin'], 'wb')
-f.write(pickle.dumps(lb))
-f.close()
+
 
 print('[INFO] evaluating...........')
 (loss, accuracy) = model.evaluate(testX, testY, batch_size=128, verbose=2)
