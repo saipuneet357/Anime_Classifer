@@ -1,0 +1,28 @@
+<link rel= "stylesheet" href= "{{ url_for('static',filename='style.css') }}">
+<script type='text/javascript' src="{{ url_for('static',filename='style.js') }}">
+</script>
+<script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+
+
+
+
+  
+
+<div align="center" class="file-upload">
+<h1>{{type}}</h1>
+
+
+<img class = 'portrait' src="{{ url_for('static', filename='images/image.jpg')}}">
+
+<div class="image-title-wrap">
+    <a href='/' > <button type="button" class="remove-image">Remove <span class="image-title">Uploaded Image</span></button>
+    </div> </a>
+    
+    <!-- Footer -->
+<footer align='center' class="w3-container w3-padding-64 w3-light-grey w3-center w3-large"> 
+
+  <p>Built by <a href="https://github.com/saipuneet357" target="_blank" class="w3-hover-text-green">Saipuneet Munikuntla</a></p>
+
+</footer>
+
+</div>

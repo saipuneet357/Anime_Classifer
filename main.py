@@ -1,73 +1,42 @@
+from flask import Flask, redirect, url_for, render_template, request
 import numpy as np
-from keras.models import Sequential
-from keras.layers.convolutional import Conv2D
-from keras.layers.convolutional import MaxPooling2D
-from keras.layers.core import Activation
-from keras.layers.core import Flatten
-from keras.layers.core import Dense
-from keras import backend as K
-from keras.layers.core import Dropout
-from keras import regularizers
-from keras.layers import BatchNormalization
+import cv2
+from load import predict
+import os
 
+app = Flask(__name__)
 
-
-class anime_model:
 	
-	def build(rows, columns, channels, labels, activation='relu', weightsPath=None):
-	
-		model = Sequential()
-	
-		inputShape = (rows, columns, channels)
+@app.route('/', methods=["POST", "GET"])
+def home():
+	if request.method == "POST":
+		image = request.files['k']
+		img_str = image.read()
+		nparr = np.fromstring(img_str, np.uint8)
+		img_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR) # cv2.IMREAD_COLOR
 		
-		if K.image_data_format() == 'channels_first':
-			inputShape = (channels, rows, columns)
-			
-		#First Layer
-		model.add(Conv2D(32, 3, padding='same', input_shape=inputShape, 		    
-				activation=activation, use_bias=True))		
-		model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
-		model.add(Conv2D(32, 3, padding='same', input_shape=inputShape, 		    
-				activation=activation, use_bias=True))		
-		model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
-		model.add(BatchNormalization(axis=1))
-		#model.add(Dropout(0.25))
+		args = {'image':img_np, 'model':'model.h5', 'labels':'lb.pickle'}
 		
-		#Second Layer
-		model.add(Conv2D(64, 3, padding='same', activation=activation))
-		model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
-		model.add(Conv2D(64, 3, padding='same', activation=activation))
-		model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
-		#model.add(BatchNormalization(axis=1))
-		#model.add(Dropout(0.25))
+		output, label = predict(**args)
 		
-		#Third Layer
-		model.add(Conv2D(128, 3, padding='same', activation=activation))
-		model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
-		#model.add(BatchNormalization(axis=1))
-		#model.add(Dropout(0.25))
+		try:
+			os.remove('static/images/image.jpg')
+			print('old file removed')
+		except:
+			print('file not available')
 		
-		#Fourth Layer
-		model.add(Conv2D(256, 3, padding='same', activation=activation))
-		model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
-		#model.add(BatchNormalization(axis=1))
+		cv2.imwrite('static/images/image.jpg', output)
 		
-		#Flatten and FC Layer
-		model.add(Flatten())
-		model.add(Dense(1028, activation=activation))
-		#model.add(Dropout(0.5))
 		
-		#Output Layer
-		model.add(Dense(1, activation='sigmoid'))
-		
-		if weightsPath is not None:
-			model.load_weights(weightsPath)
-		
-		return model
-	
-		
+		return redirect(url_for("show", label=label))
+	else:
+		return render_template('index.html')
 
 
+@app.route('/show/<label>')
+def show(label):
+	return render_template('show.html', type=label)
 
 
-
+if __name__ == '__main__':
+	app.run(debug=True)

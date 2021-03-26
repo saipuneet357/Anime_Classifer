@@ -1,6 +1,6 @@
 import argparse
 import cv2
-from main import anime_model as nn
+from model import anime_model as nn
 import numpy as np
 import os
 from sklearn.preprocessing import LabelBinarizer

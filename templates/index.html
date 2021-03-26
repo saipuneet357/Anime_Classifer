@@ -1,0 +1,37 @@
+
+<link rel= "stylesheet" href= "{{ url_for('static',filename='style.css') }}">
+<script type='text/javascript' src="{{ url_for('static',filename='style.js') }}">
+</script>
+<script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+
+<meta http-equiv='cache-control' content='no-cache'>
+<meta http-equiv='expires' content='0'>
+<meta http-equiv='pragma' content='no-cache'>
+
+
+<html>
+
+<body class="file-upload" >
+<div align='center'>
+    <h1>Anime girl vs Cartoon girl Classifier</h1>
+    <h2>Upload an image to classify as anime or cartoon</h2>
+   <form method="POST" action="#" enctype="multipart/form-data">
+      <p><input class="file-upload-btn" type="file" name="k" accept="image/*">
+      </p>
+      <p><input class="file-upload-btn" type="submit" value="Submit"></p>
+    </form>
+
+
+</div>
+
+
+
+<!-- Footer -->
+<footer align='center' class="w3-container w3-padding-64 w3-light-grey w3-center w3-large"> 
+
+  <p>Built by <a href="https://github.com/saipuneet357" target="_blank" class="w3-hover-text-green">Saipuneet Munikuntla</a></p>
+
+</footer>
+
+</body>
+</html>
