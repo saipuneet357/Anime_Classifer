@@ -101,7 +101,6 @@ tensorflow==2.2.0
 tensorflow-estimator==2.2.0
 termcolor==1.1.0
 threadpoolctl==2.1.0
-tifffile==2021.2.26
 tornado==6.1
 typing-extensions==3.7.4.3
 tzlocal==2.1
