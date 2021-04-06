@@ -23,7 +23,7 @@ Accuracy: 83.8 %
 Loss: 0.34
 
 
-------------------------------Future Changes-----------------------------------
+------------------------------**Future Changes**-----------------------------------
 
 Will use the initial layers of the pre trained network vgg16 as features for my network
 
