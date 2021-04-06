@@ -8,6 +8,8 @@ This web app classifies anime girls and cartoon girls and to an extent is able t
 
 Dataset is self built using bing image api 
 
+**Drive**: https://drive.google.com/drive/folders/1vN5hvrdLBgp60OMoQvX2EZFWE22zJb4H?usp=sharing
+
 **Anime girl images** - 775
 
 **Cartoon girl images** - 738
