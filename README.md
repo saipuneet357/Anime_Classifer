@@ -20,3 +20,15 @@ Testing set (Used the testing set as the validation set for measuring overfittin
 
 Accuracy: 83.8 %
 Loss: 0.34
+
+
+------------------------------Future Changes-----------------------------------
+Will use the initial layers of the pre trained network vgg16 as features for my network
+
+Will remove the cache issue with the web app
+
+Recreate an anime image using the art style learnt from the cartoon image and vice versa 
+
+Can use a live camera for scanning images instead of uploading as a form
+
+Upload the model onto a raspberry pi and use a webcam module for scanning images and display the classifier output on an LCD
