@@ -23,6 +23,7 @@ Loss: 0.34
 
 
 ------------------------------Future Changes-----------------------------------
+
 Will use the initial layers of the pre trained network vgg16 as features for my network
 
 Will remove the cache issue with the web app
