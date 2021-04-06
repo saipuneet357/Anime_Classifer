@@ -9,6 +9,7 @@ This web app classifies anime girls and cartoon girls and to an extent is able t
 Dataset is self built using bing image api 
 
 Anime girl images - 775
+
 Cartoon girl images - 738
 
 Training set:
